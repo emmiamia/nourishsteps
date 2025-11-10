@@ -3,6 +3,7 @@ import { createCheckin, listCheckins, updateCheckin, deleteCheckin } from "../ap
 import { motion, AnimatePresence } from "framer-motion";
 import CalendarDiary from "../components/CalendarDiary";
 import { Smile, Meh, Frown, Utensils, Activity } from "lucide-react";
+import { SkeletonList } from "../components/Skeleton";
 
 // 小表情
 function moodEmoji(mood) {
@@ -211,7 +212,7 @@ export default function CheckIn() {
       {/* 选中日期的记录列表 */}
       <div className="divider">Entries on {pickedDate}</div>
       {!rows ? (
-        <div>Loading…</div>
+        <SkeletonList count={5} />
       ) : rows.length === 0 ? (
         <div className="opacity-70">No entries for this day.</div>
       ) : (

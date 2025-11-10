@@ -1,11 +1,16 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import Home from './pages/Home';
-import CheckIn from './pages/CheckIn';
-import Toolbox from './pages/Toolbox';
-import Resources from './pages/Resources';
-import Progress from './pages/Progress';
-import Meals from "./pages/Meals";
+import { Suspense, lazy } from 'react';
+import { SkeletonCard } from './components/Skeleton';
+import ThemeToggle from './components/ThemeToggle';
+
+// Lazy load pages for code splitting
+const Home = lazy(() => import('./pages/Home'));
+const CheckIn = lazy(() => import('./pages/CheckIn'));
+const Toolbox = lazy(() => import('./pages/Toolbox'));
+const Resources = lazy(() => import('./pages/Resources'));
+const Progress = lazy(() => import('./pages/Progress'));
+const Meals = lazy(() => import('./pages/Meals'));
 
 export default function App(){
   return (
@@ -21,6 +26,7 @@ export default function App(){
             <Link className="btn btn-ghost" to="/meals">Meal</Link>
             <Link className="btn btn-ghost" to="/resources">Resources</Link>
             <Link className="btn btn-primary" to="/progress">Progress</Link>
+            <ThemeToggle />
           </div>
         </div>
 
@@ -31,15 +37,16 @@ export default function App(){
           className="mx-auto p-4 max-w-6xl"
         >
           <div className="rounded-2xl bg-base-100/70 backdrop-blur shadow-lg p-4 md:p-6">
-            <Routes>
-              <Route path="/" element={<Home/>} />
-              <Route path="/checkin" element={<CheckIn/>} />
-              <Route path="/toolbox" element={<Toolbox/>} />
-              <Route path="/resources" element={<Resources/>} />
-              <Route path="/progress" element={<Progress/>} />
-              <Route path="/meals" element={<Meals />} />
-
-            </Routes>
+            <Suspense fallback={<div className="grid gap-4"><SkeletonCard /><SkeletonCard /></div>}>
+              <Routes>
+                <Route path="/" element={<Home/>} />
+                <Route path="/checkin" element={<CheckIn/>} />
+                <Route path="/toolbox" element={<Toolbox/>} />
+                <Route path="/resources" element={<Resources/>} />
+                <Route path="/progress" element={<Progress/>} />
+                <Route path="/meals" element={<Meals />} />
+              </Routes>
+            </Suspense>
             <p className="mt-8 text-xs opacity-70">
               This app is for educational purposes only and is not medical advice.
             </p>

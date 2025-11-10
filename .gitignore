@@ -53,8 +53,14 @@ Thumbs.db
 coverage/
 .nyc_output/
 .pytest_cache/
+playwright-report/
+test-results/
+.vitest/
 
 # Temporary files
 *.tmp
 *.temp
+
+# Docker
+.dockerignore
 

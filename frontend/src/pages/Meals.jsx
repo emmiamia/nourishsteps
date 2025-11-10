@@ -5,6 +5,7 @@ import { Utensils, Pencil, Trash2, Plus } from "lucide-react";
 import { listMeals, createMeal, updateMeal, deleteMeal, mealsSummary7, getMealsMonth } from "../api";
 import CalendarDiary from "../components/CalendarDiary";
 import MealTimer from "../components/MealTimer";
+import { SkeletonList, SkeletonCard } from "../components/Skeleton";
 
 export default function Meals(){
   const todayISO = new Date().toISOString().slice(0,10);
@@ -153,12 +154,21 @@ export default function Meals(){
       </div>
 
       {/* 顶部统计 */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <Card title="Completed (7d)" value={`${stats?.meals?.completed ?? 0}%`} />
-        <Card title="Partial (7d)"   value={`${stats?.meals?.partial ?? 0}%`} />
-        <Card title="Skipped (7d)"   value={`${stats?.meals?.skipped ?? 0}%`} />
-        <Card title="Streak (days)"  value={`${stats?.streak ?? 0}`} desc="consecutive days with any meal logged" />
-      </div>
+      {!stats ? (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <Card title="Completed (7d)" value={`${stats?.meals?.completed ?? 0}%`} />
+          <Card title="Partial (7d)"   value={`${stats?.meals?.partial ?? 0}%`} />
+          <Card title="Skipped (7d)"   value={`${stats?.meals?.skipped ?? 0}%`} />
+          <Card title="Streak (days)"  value={`${stats?.streak ?? 0}`} desc="consecutive days with any meal logged" />
+        </div>
+      )}
 
       <div className="divider">Calendar</div>
       {/* 这里的 CalendarDiary 使用 badges 显示 meal 数，而不是 check-in 数 */}
@@ -171,7 +181,7 @@ export default function Meals(){
 
       <div className="divider">Logs on {pickedDate}</div>
       {!list ? (
-        <div>Loading…</div>
+        <SkeletonList count={3} />
       ) : list.length === 0 ? (
         <div className="opacity-70">No meals yet. Try “Save Log” or “Start Timer”.</div>
       ) : (

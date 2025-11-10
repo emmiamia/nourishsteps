@@ -8,6 +8,7 @@ import {
 } from "recharts";
 import { Flame, CalendarCheck2, Trophy, Sparkles, RefreshCcw } from "lucide-react";
 import { getSummary7, listCheckins } from "../api";
+import { SkeletonChart } from "../components/Skeleton";
 
 /* -------------------- Animated Background -------------------- */
 function AnimatedBg() {
@@ -335,9 +336,7 @@ function ChartCard({ title, subtitle, children }) {
 }
 
 function ChartSkeleton() {
-  return (
-    <div className="h-full w-full rounded-xl bg-base-200/60 animate-pulse" />
-  );
+  return <SkeletonChart />;
 }
 
 function EmptyState() {
