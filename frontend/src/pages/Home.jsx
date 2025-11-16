@@ -11,7 +11,7 @@ export default function Home(){
 
   return (
     // 整块主区域：更高、更显眼
-    <section className="min-h-[70vh] flex items-center justify-center bg-gradient-to-b from-white via-blue-50/40 to-pink-50/30 rounded-3xl shadow-inner p-6 md:p-10">
+    <section className="min-h-[70vh] flex items-center justify-center bg-gradient-to-b from-base-100 via-base-200/40 to-base-300/30 rounded-3xl shadow-inner p-6 md:p-10">
       {/* 内部内容容器：更宽 */}
       <div className="w-full max-w-7xl mx-auto space-y-8">
         {/* Hero 更大更居中 */}
@@ -19,13 +19,13 @@ export default function Home(){
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="relative overflow-hidden rounded-3xl bg-gradient-to-tr from-pink-100/70 to-blue-100/70 p-10 md:p-12 w-full max-w-5xl mx-auto text-left md:text-left"
+          className="relative overflow-hidden rounded-3xl bg-gradient-to-tr from-base-200/70 to-base-300/70 p-10 md:p-12 w-full max-w-5xl mx-auto text-left md:text-left"
         >
           <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-semibold leading-tight">
+            <h1 className="text-4xl md:text-5xl font-semibold leading-tight text-base-content">
               Gentle support, one step at a time.
             </h1>
-            <p className="mt-3 text-base opacity-80">
+            <p className="mt-3 text-base opacity-80 text-base-content">
               A soft, private space to check-in, find coping tools, and stay supported during meals.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
@@ -37,7 +37,7 @@ export default function Home(){
           {/* 漂浮装饰 */}
           <motion.div
             aria-hidden
-            className="absolute -right-10 -bottom-10 w-72 h-72 rounded-full bg-pink-200/40 blur-2xl"
+            className="absolute -right-10 -bottom-10 w-72 h-72 rounded-full bg-primary/20 blur-2xl"
             animate={{ y: [0, -8, 0] }}
             transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
           />
