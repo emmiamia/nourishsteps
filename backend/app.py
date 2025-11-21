@@ -6,8 +6,22 @@ from calendar import monthrange
 from sqlalchemy import and_
 
 app = Flask(__name__)
-# Allow all localhost ports for development
-CORS(app, resources={r"/api/*": {"origins": ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "http://localhost:8080"]}})
+# CORS: Allow localhost for dev, Render URLs for production
+import os
+FRONTEND_URL = os.getenv('FRONTEND_URL', '')
+# In production, allow all origins (Render subdomains vary)
+# In development, restrict to localhost
+if os.getenv('FLASK_ENV') == 'production' or FRONTEND_URL:
+    # Production: allow all (Render will handle security)
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
+else:
+    # Development: restrict to localhost
+    CORS(app, resources={r"/api/*": {"origins": [
+        "http://localhost:5173",
+        "http://localhost:5174", 
+        "http://localhost:3000",
+        "http://localhost:8080"
+    ]}})
 
 @app.get("/api/health")
 def health():

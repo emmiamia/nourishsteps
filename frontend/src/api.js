@@ -1,5 +1,6 @@
 // frontend/src/api.js
-const API = import.meta.env.VITE_API || "http://localhost:5001";
+// In production (with nginx), use relative paths. In dev, use explicit API URL.
+const API = import.meta.env.VITE_API || (import.meta.env.PROD ? "" : "http://localhost:5001");
 
 /** 通用请求封装（带超时 & 统一错误解析） */
 async function request(path, { method = "GET", json, signal, headers = {} } = {}) {
