@@ -1,9 +1,10 @@
+import os
 from datetime import datetime, date
 from sqlalchemy import create_engine, Column, Integer, String, Date, DateTime, Text
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.sql import func
 
-engine = create_engine("sqlite:///nourish.db", echo=False, future=True)
+engine = create_engine(os.getenv("DATABASE_URL", "sqlite:///nourish.db"), echo=False, future=True)
 Base = declarative_base()
 SessionLocal = sessionmaker(bind=engine, autoflush=False, future=True)
 
@@ -24,6 +25,12 @@ class Goal(Base):
     status = Column(String(16), default="active")
     created_at = Column(DateTime, default=datetime.utcnow)
 
+    owner_scope = Column(String(64), nullable=True)
+    updated_at = Column(DateTime, nullable=True)
+    follow_up_after = Column(Date, nullable=True)
+    last_reviewed_at = Column(DateTime, nullable=True)
+    source = Column(String(32), nullable=True)
+
 class Meal(Base):
     __tablename__ = "meals"
     id = Column(Integer, primary_key=True)
@@ -41,5 +48,3 @@ class Resource(Base):
     url = Column(String(500))
     type = Column(String(24))
     tags = Column(String(200))
-
-Base.metadata.create_all(engine)

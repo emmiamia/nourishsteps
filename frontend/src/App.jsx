@@ -5,6 +5,7 @@ import { SkeletonCard } from './components/Skeleton';
 import ThemeToggle from './components/ThemeToggle';
 
 // Lazy load pages for code splitting
+const ReflectionPanel = lazy(() => import('./components/ReflectionPanel'));
 const Home = lazy(() => import('./pages/Home'));
 const CheckIn = lazy(() => import('./pages/CheckIn'));
 const Toolbox = lazy(() => import('./pages/Toolbox'));
@@ -16,15 +17,16 @@ export default function App(){
   return (
     <BrowserRouter>
       <div className="min-h-screen text-base-content bg-noise">
-        <div className="navbar bg-base-200/70 backdrop-blur sticky top-0 z-10 shadow-sm">
+        <div className="navbar flex-col items-start sm:flex-row sm:items-center bg-base-200/70 backdrop-blur sticky top-0 z-10 shadow-sm">
           <div className="flex-1">
             <Link className="btn btn-ghost text-xl" to="/">NourishSteps</Link>
           </div>
-          <div className="flex-none gap-2">
+          <div className="flex w-full min-w-0 items-center gap-1 overflow-x-auto sm:w-auto">
             <Link className="btn btn-ghost" to="/checkin">Check-In</Link>
             <Link className="btn btn-ghost" to="/toolbox">Toolbox</Link>
             <Link className="btn btn-ghost" to="/meals">Meal</Link>
             <Link className="btn btn-ghost" to="/resources">Resources</Link>
+            <Link className="btn btn-ghost" to="/reflect">Reflect</Link>
             <Link className="btn btn-primary" to="/progress">Progress</Link>
             <ThemeToggle />
           </div>
@@ -45,6 +47,7 @@ export default function App(){
                 <Route path="/resources" element={<Resources/>} />
                 <Route path="/progress" element={<Progress/>} />
                 <Route path="/meals" element={<Meals />} />
+                <Route path="/reflect" element={<ReflectionPanel />} />
               </Routes>
             </Suspense>
             <p className="mt-8 text-xs opacity-70">

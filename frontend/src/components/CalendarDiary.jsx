@@ -1,3 +1,4 @@
+import { localDateISO } from "../utils/date";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { getMonth } from "../api";
@@ -29,7 +30,7 @@ export default function CalendarDiary({
   onMonthChange,
 }){
   const today = new Date();
-  const todayISO = today.toISOString().slice(0,10);
+  const todayISO = localDateISO(today);
 
   const [y0,m0] = useMemo(()=>[
     selectedDate ? Number(selectedDate.slice(0,4)) : today.getFullYear(),

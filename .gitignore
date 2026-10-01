@@ -64,3 +64,8 @@ test-results/
 # Docker
 .dockerignore
 
+
+# Agent private runtime artifacts
+*.db.*.bak
+backend/.env
+backend/evals/runs/

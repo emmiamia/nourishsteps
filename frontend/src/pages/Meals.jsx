@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+import { localDateISO } from "../utils/date";
 // src/pages/Meals.jsx
 import React, { useEffect, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,9 +10,10 @@ import MealTimer from "../components/MealTimer";
 import { SkeletonList, SkeletonCard } from "../components/Skeleton";
 
 export default function Meals(){
-  const todayISO = new Date().toISOString().slice(0,10);
+  const todayISO = localDateISO();
   const [pickedDate, setPickedDate] = useState(todayISO);
 
+  const [mealStatus, setMealStatus] = useState("planned");
   const [mealType, setMealType] = useState("breakfast"); // 新增：早餐/午餐/晚餐/加餐
   const [list, setList] = useState(null);
   const [stats, setStats] = useState(null);
@@ -82,7 +85,8 @@ export default function Meals(){
       await createMeal({
         date: pickedDate,
         type: "meal",
-        meal_type: mealType,      // 关键：写入 meal_type
+        meal_type: mealType,
+        status: mealStatus,      // 关键：写入 meal_type
         note: ""
       });
       await refreshAll(pickedDate);
@@ -95,6 +99,7 @@ export default function Meals(){
       date: pickedDate,
       type: "meal",
       meal_type: mealType,
+        status: mealStatus,
       duration_sec: totalSeconds,
       note: ""
     });
@@ -111,6 +116,7 @@ export default function Meals(){
       date: editing.date,
       type: editing.type || "meal",
       meal_type: editing.meal_type || "meal",
+      status: editing.status,
       note: editing.note || ""
     });
     setEditing(null);
@@ -128,6 +134,7 @@ export default function Meals(){
 
   return (
     <div className="grid gap-6">
+      <Link className="link text-sm justify-self-start" to="/reflect">Try optional reflection with fictional demo data</Link>
       {/* 顶部操作 */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h2 className="text-2xl font-medium">Meals</h2>
@@ -144,6 +151,11 @@ export default function Meals(){
             <option value="snack">Snack</option>
           </select>
 
+          <label className="form-control"><span className="label-text">Meal status</span>
+            <select aria-label="Meal status" className="select select-bordered" value={mealStatus} onChange={e=>setMealStatus(e.target.value)}>
+              {['planned','completed','partial','skipped'].map(value=><option key={value} value={value}>{value}</option>)}
+            </select>
+          </label>
           <button className="btn" onClick={quickLog} disabled={saving}>
             <Utensils className="w-4 h-4 mr-1" /> Save Log
           </button>
@@ -163,10 +175,10 @@ export default function Meals(){
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-          <Card title="Completed (7d)" value={`${stats?.meals?.completed ?? 0}%`} />
-          <Card title="Partial (7d)"   value={`${stats?.meals?.partial ?? 0}%`} />
-          <Card title="Skipped (7d)"   value={`${stats?.meals?.skipped ?? 0}%`} />
-          <Card title="Streak (days)"  value={`${stats?.streak ?? 0}`} desc="consecutive days with any meal logged" />
+          <Card title="Completed logs (7d)" value={`${stats?.counts?.completed ?? 0}`} />
+          <Card title="Partial logs (7d)" value={`${stats?.counts?.partial ?? 0}`} />
+          <Card title="Skipped logs (7d)" value={`${stats?.counts?.skipped ?? 0}`} />
+          <Card title="Days without logs" value={`${stats?.unknown_days ?? 0}`} desc="No entry means unknown, not skipped" />
         </div>
       )}
 
@@ -221,7 +233,7 @@ export default function Meals(){
               <h3 className="font-bold text-lg">Edit Meal</h3>
               <div className="grid gap-3 mt-3">
                 <input type="date" className="input input-bordered" value={editing.date}
-                  max={new Date().toISOString().slice(0,10)}
+                  max={localDateISO()}
                   onChange={e=>setEditing({...editing, date:e.target.value})} />
                 <select className="select select-bordered" value={editing.meal_type || "meal"}
                   onChange={e=>setEditing({...editing, meal_type: e.target.value})}>
@@ -230,6 +242,11 @@ export default function Meals(){
                   <option value="dinner">Dinner</option>
                   <option value="snack">Snack</option>
                 </select>
+                <label className="form-control"><span className="label-text">Meal status</span>
+                  <select className="select select-bordered" value={editing.status} onChange={e=>setEditing({...editing, status:e.target.value})}>
+                    {['planned','completed','partial','skipped'].map(value=><option key={value} value={value}>{value}</option>)}
+                  </select>
+                </label>
                 <textarea className="textarea textarea-bordered" placeholder="note (optional)"
                   value={editing.note || ""} onChange={e=>setEditing({...editing, note: e.target.value})}/>
               </div>

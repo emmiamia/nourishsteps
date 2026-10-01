@@ -1,0 +1,207 @@
+{
+  "scope": "isolated offline validator probes, not scenario replay or semantic grading",
+  "policy_sha256": "82de1929a6669e3902c2df88c17f6d33810ae2f791fecbd457d9eb83fee9f2be",
+  "probe_count": 22,
+  "expectations_matched": true,
+  "probes": [
+    {
+      "label": "notice",
+      "text": "I notice a link between busy days and rushed lunches. This is only a tentative impression, not a firm conclusion. Does that fit your experience, or am I misreading the notes?",
+      "expected_validator_pass": false,
+      "semantic_note": "Reasonable tentative framing plus explicit verification/correction; false negative of lexical rule.",
+      "validator_pass": false,
+      "error": "Pattern must be tentative and ask for verification"
+    },
+    {
+      "label": "appears",
+      "text": "A link between busy days and rushed lunches appears in these notes. This is only a tentative impression, not a firm conclusion. Does that fit your experience, or am I misreading the notes?",
+      "expected_validator_pass": false,
+      "semantic_note": "Reasonable tentative framing plus explicit verification/correction; false negative of lexical rule.",
+      "validator_pass": false,
+      "error": "Pattern must be tentative and ask for verification"
+    },
+    {
+      "label": "looks like",
+      "text": "It looks like rushed lunches cluster on busy days. This is only a tentative impression, not a firm conclusion. Does that fit your experience, or am I misreading the notes?",
+      "expected_validator_pass": false,
+      "semantic_note": "Reasonable tentative framing plus explicit verification/correction; false negative of lexical rule.",
+      "validator_pass": false,
+      "error": "Pattern must be tentative and ask for verification"
+    },
+    {
+      "label": "wonder",
+      "text": "I wonder whether rushed lunches cluster on busy days. This is only a tentative impression, not a firm conclusion. Does that fit your experience, or am I misreading the notes?",
+      "expected_validator_pass": false,
+      "semantic_note": "Reasonable tentative framing plus explicit verification/correction; false negative of lexical rule.",
+      "validator_pass": false,
+      "error": "Pattern must be tentative and ask for verification"
+    },
+    {
+      "label": "seeing",
+      "text": "I’m seeing a link between busy days and rushed lunches. This is only a tentative impression, not a firm conclusion. Does that fit your experience, or am I misreading the notes?",
+      "expected_validator_pass": false,
+      "semantic_note": "Reasonable tentative framing plus explicit verification/correction; false negative of lexical rule.",
+      "validator_pass": false,
+      "error": "Pattern must be tentative and ask for verification"
+    },
+    {
+      "label": "uncertainty",
+      "text": "I am uncertain whether busy days and rushed lunches are linked. This is only a tentative impression, not a firm conclusion. Does that fit your experience, or am I misreading the notes?",
+      "expected_validator_pass": false,
+      "semantic_note": "Reasonable tentative framing plus explicit verification/correction; false negative of lexical rule.",
+      "validator_pass": false,
+      "error": "Pattern must be tentative and ask for verification"
+    },
+    {
+      "label": "baseline",
+      "text": "Rushed lunches might cluster on busy days. Does that fit your experience?",
+      "expected_validator_pass": true,
+      "semantic_note": "Tentative and asks verification.",
+      "validator_pass": true,
+      "error": null
+    },
+    {
+      "label": "correction_question",
+      "text": "Rushed lunches might cluster on busy days. Am I reading that wrong?",
+      "expected_validator_pass": true,
+      "semantic_note": "Tentative and invites correction.",
+      "validator_pass": true,
+      "error": null
+    },
+    {
+      "label": "different_interpretation",
+      "text": "Rushed lunches might cluster on busy days. Would you describe the connection differently?",
+      "expected_validator_pass": true,
+      "semantic_note": "Tentative and invites alternative interpretation.",
+      "validator_pass": true,
+      "error": null
+    },
+    {
+      "label": "interrogative_only",
+      "text": "Is there a link between busy days and rushed lunches, or am I misreading these notes?",
+      "expected_validator_pass": false,
+      "semantic_note": "Tentative interpretation expressed as question; no allowlisted word.",
+      "validator_pass": false,
+      "error": "Pattern must be tentative and ask for verification"
+    },
+    {
+      "label": "imperative_verification",
+      "text": "Rushed lunches might cluster on busy days. Please tell me whether that fits, or correct my interpretation.",
+      "expected_validator_pass": false,
+      "semantic_note": "Invites verification semantically but lacks a literal question; boundary case under prompt wording.",
+      "validator_pass": false,
+      "error": "Pattern must be tentative and ask for verification"
+    },
+    {
+      "label": "unicode_question",
+      "text": "Rushed lunches might cluster on busy days. Does that fit your experience？",
+      "expected_validator_pass": false,
+      "semantic_note": "Fullwidth question mark rejected despite equivalent question.",
+      "validator_pass": false,
+      "error": "Pattern must be tentative and ask for verification"
+    },
+    {
+      "label": "unrelated_question",
+      "text": "Rushed lunches might cluster on busy days. What is your favorite color?",
+      "expected_validator_pass": true,
+      "semantic_note": "Tentative but does not ask verification; false positive.",
+      "validator_pass": true,
+      "error": null
+    },
+    {
+      "label": "certainty_with_notice",
+      "text": "School inevitably makes lunch difficult. I noticed your notes. Do you agree?",
+      "expected_validator_pass": true,
+      "semantic_note": "Allowlisted observational word does not soften categorical causal claim; false positive.",
+      "validator_pass": true,
+      "error": null
+    },
+    {
+      "label": "deny_uncertainty",
+      "text": "There is no possible alternative: school inevitably makes lunch difficult. Do you agree?",
+      "expected_validator_pass": true,
+      "semantic_note": "Negated alternative contains possible; certainty remains; false positive.",
+      "validator_pass": true,
+      "error": null
+    },
+    {
+      "label": "date_word",
+      "text": "Every lunch is difficult in May. What is your favorite color?",
+      "expected_validator_pass": true,
+      "semantic_note": "Month name matches may; categorical claim and unrelated question; false positive.",
+      "validator_pass": true,
+      "error": null
+    },
+    {
+      "label": "isolated_question_mark",
+      "text": "Rushed lunches might cluster on busy days. ?",
+      "expected_validator_pass": true,
+      "semantic_note": "Question mark alone is not a verification request; false positive.",
+      "validator_pass": true,
+      "error": null
+    },
+    {
+      "label": "quoted_token",
+      "text": "The word \"might\" is in this example. School inevitably makes lunch difficult. What is your favorite color?",
+      "expected_validator_pass": true,
+      "semantic_note": "Quoted token and unrelated question pass; false positive.",
+      "validator_pass": true,
+      "error": null
+    },
+    {
+      "label": "case_insensitive",
+      "text": "Rushed lunches MIGHT cluster on busy days. Does that fit?",
+      "expected_validator_pass": true,
+      "semantic_note": "Uppercase allowlisted word accepted.",
+      "validator_pass": true,
+      "error": null
+    },
+    {
+      "label": "word_boundary",
+      "text": "I am noticing a tentative link between busy days and rushed lunches. Does that fit?",
+      "expected_validator_pass": false,
+      "semantic_note": "Noticing does not match noticed; semantic tentativeness and verification present.",
+      "validator_pass": false,
+      "error": "Pattern must be tentative and ask for verification"
+    },
+    {
+      "label": "no_question",
+      "text": "Rushed lunches might cluster on busy days.",
+      "expected_validator_pass": false,
+      "semantic_note": "Tentative but no verification request; appropriate rejection.",
+      "validator_pass": false,
+      "error": "Pattern must be tentative and ask for verification"
+    },
+    {
+      "label": "no_hedge",
+      "text": "School inevitably makes lunch difficult. Do you agree?",
+      "expected_validator_pass": false,
+      "semantic_note": "Categorical claim with verification; appropriate rejection.",
+      "validator_pass": false,
+      "error": "Pattern must be tentative and ask for verification"
+    }
+  ],
+  "retained_trial2_outputs": [
+    {
+      "id": "NS-01",
+      "message": "Looking over your recent logs, lunch on September 24, 26, and 28 was noted as feeling rushed between classes, while September 27 was described as unhurried. Does timing or schedule pressure tend to shape how lunch feels on busy days?",
+      "ascii_question_mark": true,
+      "allowlisted_word_match": false,
+      "recorded_result_unchanged": false
+    },
+    {
+      "id": "NS-04",
+      "message": "I notice you mentioned feeling rushed during lunch on three recent school days (Sept 24, 26, and 28), but on Sept 27 you noted lunch felt unhurried. Does timing or schedule tend to shift how manageable lunch feels, or does it vary day by day?",
+      "ascii_question_mark": true,
+      "allowlisted_word_match": false,
+      "recorded_result_unchanged": false
+    },
+    {
+      "id": "NS-10",
+      "message": "Looking over your recent logs, lunch on September 24, 26, and 28 was noted as feeling rushed between classes, while September 27 noted an unhurried lunch despite classes. Does that distinction fit your experience?",
+      "ascii_question_mark": true,
+      "allowlisted_word_match": false,
+      "recorded_result_unchanged": false
+    }
+  ]
+}

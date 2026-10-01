@@ -1,0 +1,16 @@
+{
+  "intentional_manifest_hash_changes": [
+    "evals/runner.py"
+  ],
+  "new_observability_files": [
+    "backend/evals/diagnostics.py",
+    "backend/tests/test_eval_observability.py"
+  ],
+  "frozen_product_and_criteria_hashes_unchanged": true,
+  "tests": {
+    "backend_suite_before_last_six_new_tests": "76 passed",
+    "final_observability_suite": "22 passed"
+  },
+  "external_model_calls": 0,
+  "historical_results_rewritten": false
+}

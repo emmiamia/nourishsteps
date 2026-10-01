@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+import { localDateISO } from "../utils/date";
 import React, { useEffect, useState, useRef } from "react";
 import { createCheckin, listCheckins, updateCheckin, deleteCheckin } from "../api";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,7 +15,7 @@ function moodEmoji(mood) {
 
 export default function CheckIn() {
   // 日历选中的日期（默认今天）
-  const todayISO = new Date().toISOString().slice(0, 10);
+  const todayISO = localDateISO();
   const [pickedDate, setPickedDate] = useState(todayISO);
 
   // 表单数据
@@ -122,6 +124,7 @@ export default function CheckIn() {
 
   return (
     <div className="grid gap-6">
+      <Link className="link text-sm justify-self-start" to="/reflect">Try optional reflection with fictional demo data</Link>
       <h2 className="text-2xl font-medium">Daily Check-In</h2>
 
       {/* 表单 */}

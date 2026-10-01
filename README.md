@@ -60,6 +60,17 @@ A gentle, full-stack web application designed as a supportive companion for reco
 - **Docker Compose** - Multi-container orchestration
 - **Nginx** - Web server and reverse proxy
 
+## Reflection agent V1 (local synthetic demo)
+
+The optional **Reflect** experience uses free-tier Google Gemini tool calling to explore tentative patterns, retrieve source-checked general support, and propose editable reflections or intentions. Saving always requires confirmation. It uses a separate fictional dataset and does not read your existing diary.
+
+- [Setup and demo guide](docs/AGENT_V1_GUIDE.md)
+- [Development journal and evaluation status](docs/AGENT_DEVELOPMENT_JOURNAL.md)
+- [30 evaluation scenarios](backend/evals/cases.json)
+- [Evaluation rubric](backend/evals/RUBRIC.md)
+
+A backend API key is required for model responses. This local demo is not ready for real-user clinical use or public multi-user deployment. Model-quality evaluation remains separate from application tests.
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -173,10 +184,11 @@ npm run test:e2e      # E2E tests with Playwright
 
 ## 🔒 Security & Privacy
 
-- All data stored locally (SQLite database)
+- Journal data is stored in the backend SQLite database (on the server when deployed)
+- The optional agent sends messages and consented synthetic demo context to Google Gemini by default (an unbilled Free-tier project is required)
 - No external analytics or tracking
 - CORS configured for development
-- Input validation on all API endpoints
+- API validation and tests cover common input errors; the application has no multi-user authentication
 
 ## 📝 API Documentation
 

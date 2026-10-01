@@ -1,27 +1,38 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from models import SessionLocal, CheckIn, Resource, Meal
+from models import SessionLocal, CheckIn, Resource, Meal, Base, engine
 from datetime import date, timedelta
 from calendar import monthrange
 from sqlalchemy import and_
 
 app = Flask(__name__)
-# CORS: Allow localhost for dev, Render URLs for production
 import os
-FRONTEND_URL = os.getenv('FRONTEND_URL', '')
-# In production, allow all origins (Render subdomains vary)
-# In development, restrict to localhost
-if os.getenv('FLASK_ENV') == 'production' or FRONTEND_URL:
-    # Production: allow all (Render will handle security)
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
-else:
-    # Development: restrict to localhost
-    CORS(app, resources={r"/api/*": {"origins": [
-        "http://localhost:5173",
-        "http://localhost:5174", 
-        "http://localhost:3000",
-        "http://localhost:8080"
-    ]}})
+# Explicit origins only. A frontend URL is not authentication.
+origins = ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:3000", "http://localhost:8080"]
+if os.getenv('FRONTEND_URL'):
+    origins.append(os.environ['FRONTEND_URL'])
+CORS(app, resources={r"/api/*": {"origins": origins}})
+Base.metadata.create_all(engine, tables=[CheckIn.__table__, Meal.__table__, Resource.__table__])
+from agent.routes import bp as agent_blueprint
+app.register_blueprint(agent_blueprint)
+
+@app.before_request
+def validate_basic_payload():
+    if request.path.startswith('/api/agent'):
+        return None
+    if request.method in ['POST', 'PATCH']:
+        data = request.get_json(silent=True)
+        if not isinstance(data, dict):
+            return jsonify(error='Expected a JSON object'), 400
+        for key in ['note', 'meal_type', 'meal_status', 'status', 'date']:
+            if key in data and data[key] is not None and not isinstance(data[key], str):
+                return jsonify(error=f'{key} must be text'), 400
+    if 'limit' in request.args:
+        try:
+            if not 1 <= int(request.args['limit']) <= 1000:
+                raise ValueError()
+        except ValueError:
+            return jsonify(error='limit must be a positive integer'), 400
 
 @app.get("/api/health")
 def health():
@@ -51,7 +62,10 @@ def create_checkin():
     if meal not in ["skipped", "partial", "completed"]:
         return jsonify({"error": "invalid meal_status (skipped|partial|completed)"}), 400
 
-    d = date.fromisoformat(data["date"]) if data.get("date") else date.today()
+    try:
+        d = date.fromisoformat(data["date"]) if data.get("date") else date.today()
+    except (TypeError, ValueError):
+        return jsonify(error="invalid date (YYYY-MM-DD)"), 400
 
     db = SessionLocal()
     try:
@@ -222,7 +236,7 @@ def month_view():
     try:
         year = int(request.args.get("year"))
         month = int(request.args.get("month"))
-        assert 1 <= month <= 12
+        assert 1 <= month <= 12 and 1 <= year <= 9998
     except Exception:
         return jsonify({"error": "year/month required, e.g. ?year=2025&month=11"}), 400
 
@@ -340,7 +354,7 @@ def meals_create():
 def meals_update(mid):
     data = request.get_json() or {}
     db = SessionLocal()
-    m = db.query(Meal).get(mid)
+    m = db.get(Meal, mid)
     if not m:
         db.close()
         return jsonify({"error":"not found"}), 404
@@ -394,85 +408,36 @@ def meals_update(mid):
 @app.delete("/api/meals/<int:mid>")
 def meals_delete(mid):
     db = SessionLocal()
-    m = db.query(Meal).get(mid)
+    m = db.get(Meal, mid)
     if not m:
         db.close()
         return jsonify({"error":"not found"}), 404
     db.delete(m); db.commit(); db.close()
     return jsonify({"ok": True})
 
-# 7天汇总（天数/状态计数/streak）
-# 统计逻辑：
-# - completed: 一天中有 breakfast, lunch, dinner 三种都记录了
-# - partial: 一天中有记录，但不是三餐都有
-# - skipped: 一天中没有任何记录
+# Explicit meal statuses, separate from logging coverage.
 @app.get("/api/meals/summary7")
 def meals_summary7():
-    db = SessionLocal()
-    today = date.today()
-    days = []
-    status_counter = {"completed":0,"partial":0,"skipped":0}
-    
-    # 定义三餐类型
-    main_meals = {"breakfast", "lunch", "dinner"}
-    
-    # 先收集所有7天的数据
-    day_statuses = []
-    for i in range(6, -1, -1):
-        d = today - timedelta(days=i)
-        day_items = db.query(Meal).filter(Meal.date == d).all()
-        
-        # 统计这一天记录的三餐类型（只统计 breakfast, lunch, dinner，忽略 snack）
-        logged_meals = set()
-        for it in day_items:
-            if it.meal_type in main_meals:
-                logged_meals.add(it.meal_type)
-        
-        # 判断这一天属于哪个状态
-        if len(logged_meals) == 0:
-            # 没有任何记录
-            status_counter["skipped"] += 1
-            day_status = "skipped"
-        elif len(logged_meals) == 3:
-            # 三餐都有记录
-            status_counter["completed"] += 1
-            day_status = "completed"
-        else:
-            # 有记录但不是三餐都有
-            status_counter["partial"] += 1
-            day_status = "partial"
-        
-        day_statuses.append(day_status)
-        days.append({
-            "date": d.isoformat(), 
-            "count": len(day_items),
-            "status": day_status
-        })
-    
-    # 计算连续天数（从今天往前数，连续有记录的天数，completed 或 partial 都算）
-    # 一旦遇到 skipped 就停止
-    streak = 0
-    for day_status in reversed(day_statuses):  # 从今天往前数
-        if day_status != "skipped":
+    with SessionLocal() as db:
+        today = date.today()
+        rows = db.query(Meal).filter(Meal.date >= today-timedelta(days=6), Meal.date <= today).all()
+        counts = {key: 0 for key in ['completed','partial','skipped','planned']}
+        days = []
+        for i in range(6, -1, -1):
+            d = today-timedelta(days=i)
+            entries = [row for row in rows if row.date == d]
+            for row in entries:
+                counts[row.status] += 1
+            days.append({'date':d.isoformat(),'count':len(entries),'status':'logged' if entries else 'unknown'})
+        streak = 0
+        for day in reversed(days):
+            if not day['count']:
+                break
             streak += 1
-        else:
-            break
-    
-    db.close()
-    
-    # 计算百分比（基于7天）
-    total_days = 7
-    meals_stats = {
-        "completed": round(status_counter["completed"] / total_days * 100),
-        "partial": round(status_counter["partial"] / total_days * 100),
-        "skipped": round(status_counter["skipped"] / total_days * 100)
-    }
-    
-    return jsonify({
-        "days": days, 
-        "meals": meals_stats,  # 改为 meals 以匹配前端
-        "streak": streak
-    })
+        total = len(rows)
+        return jsonify(days=days, meals={key:round(n/total*100) if total else 0 for key,n in counts.items()},
+                       counts=counts, logged_days=sum(bool(d['count']) for d in days),
+                       unknown_days=sum(not d['count'] for d in days), streak=streak)
 
 # 月份视图：返回该月每天的 meals 数量
 @app.get("/api/meals/month")
@@ -480,7 +445,7 @@ def meals_month_view():
     try:
         year = int(request.args.get("year"))
         month = int(request.args.get("month"))
-        assert 1 <= month <= 12
+        assert 1 <= month <= 12 and 1 <= year <= 9998
     except Exception:
         return jsonify({"error": "year/month required, e.g. ?year=2025&month=11"}), 400
 
